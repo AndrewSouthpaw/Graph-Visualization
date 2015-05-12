@@ -26,12 +26,12 @@
           var force = d3.layout.force()
               .charge(-500)
               // .linkDistance(30)
-              .linkDistance(function(link) { return link.value * 12 })
+              .linkDistance(function(link) { return link.value * 12; })
               .size([width, height]);
 
-          var svg = d3.select("body").append("svg")
-              .attr("width", width)
-              .attr("height", height);
+          var svg = d3.select('body').append('svg')
+              .attr('width', width)
+              .attr('height', height);
 
           var nodes = [
             {name: 0, group: 0},
@@ -67,24 +67,24 @@
               .links(links)
               .start();
 
-          svg.append("defs").append("marker")
-            .attr("id", "arrowhead")
-            .attr("refX", 6 + 3) /*must be smarter way to calculate shift*/
-            .attr("refY", 2)
-            .attr("markerWidth", 6)
-            .attr("markerHeight", 4)
-            .attr("orient", "auto")
-            .append("path")
-              .attr("d", "M 0,0 V 4 L6,2 Z"); //this is actual shape for arrowhead
+          svg.append('defs').append('marker')
+            .attr('id', 'arrowhead')
+            .attr('refX', 6 + 3) /*must be smarter way to calculate shift*/
+            .attr('refY', 2)
+            .attr('markerWidth', 6)
+            .attr('markerHeight', 4)
+            .attr('orient', 'auto')
+            .append('path')
+              .attr('d', 'M 0,0 V 4 L6,2 Z'); //this is actual shape for arrowhead
 
 
-          var link = svg.selectAll(".link")
+          var link = svg.selectAll('.link')
             .data(links)
-            .enter().append("line")
-            .attr("class", "link")
+            .enter().append('line')
+            .attr('class', 'link')
             .attr('marker-end', 'url(#arrowhead)')
-            .style("stroke-width", 2);
-            // .style("stroke-width", function(d) { return Math.sqrt(d.value); });
+            .style('stroke-width', 2);
+            // .style('stroke-width', function(d) { return Math.sqrt(d.value); });
 
           // Create the groups under svg
           var gnodes = svg.selectAll('g.gnode')
@@ -93,23 +93,23 @@
             .append('g')
             .classed('gnode', true);
 
-          var node = gnodes.append("circle")
-              .attr("class", "node")
-              .attr("r", 10)
-              .style("fill", function(d) { return color(d.group); })
+          var node = gnodes.append('circle')
+              .attr('class', 'node')
+              .attr('r', 10)
+              .style('fill', function(d) { return color(d.group); })
               .call(force.drag);
 
           var labels = gnodes.append('text')
             .text(function(d) { return d.name.toString(); });
 
-          node.append("title")
+          node.append('title')
               .text(function(d) { return d.name; });
 
-          force.on("tick", function() {
-            link.attr("x1", function(d) { return d.source.x; })
-                .attr("y1", function(d) { return d.source.y; })
-                .attr("x2", function(d) { return d.target.x; })
-                .attr("y2", function(d) { return d.target.y; });
+          force.on('tick', function() {
+            link.attr('x1', function(d) { return d.source.x; })
+                .attr('y1', function(d) { return d.source.y; })
+                .attr('x2', function(d) { return d.target.x; })
+                .attr('y2', function(d) { return d.target.y; });
 
             gnodes.attr('transform', function(d) {
               return 'translate(' + [d.x, d.y] + ')';
@@ -117,10 +117,10 @@
 
             labels.attr('transform', function(d) {
               return 'translate(' + [-2, 5] + ')';
-            })
+            });
 
-            // node.attr("cx", function(d) { return d.x; })
-            //     .attr("cy", function(d) { return d.y; });
+            // node.attr('cx', function(d) { return d.x; })
+            //     .attr('cy', function(d) { return d.y; });
           });
 
         });
