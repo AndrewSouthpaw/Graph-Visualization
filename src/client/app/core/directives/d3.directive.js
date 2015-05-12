@@ -2,21 +2,23 @@
 
   'use strict';
 
-  angular.module('d3AngularApp', ['d3'])
+  angular
+    .module('app.core')
     .directive('d3Bars', d3Bars);
 
   /* @ngInject */
   function d3Bars($window, $timeout, d3Service) {
     return {
-      restrict: 'A',
+      restrict: 'EA',
       scope: {
-        data: '=',
+        // data: '=',
         label: '@',
         onClick: '&'
       },
       link: function(scope, ele, attrs) {
         d3Service.d3().then(function(d3) {
 
+          console.log('reached')
           var renderTimeout;
           var margin = parseInt(attrs.margin) || 20,
               barHeight = parseInt(attrs.barHeight) || 20,
@@ -25,6 +27,14 @@
           var svg = d3.select(ele[0])
             .append('svg')
             .style('width', '100%');
+
+          // hard-code data
+          scope.data = [
+            {name: "Greg", score: 98},
+            {name: "Ari", score: 96},
+            {name: 'Q', score: 75},
+            {name: "Loser", score: 48}
+          ];
 
           $window.onresize = function() {
             scope.$apply();
