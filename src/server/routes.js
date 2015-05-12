@@ -4,9 +4,6 @@ var errorHandler = require('./utils/errorHandler');
 
 module.exports = function applicationRouter(app) {
 
-  // Load scraping route onto router
-  require('./api/scraper')(router);
-
   /**
    * catchall router if the request hasn't been handled by the other routes.
    * Passes off responsibility to ui-router by serving up base index.html

@@ -15,26 +15,7 @@
        */
       .state('landing', {
         url: '/',
-        views: {
-          '': {
-            templateUrl: '/html/core/views/landing.html'
-          },
-
-          'events@landing': {
-            templateUrl: '/html/core/views/events.html',
-            controller: 'EventsController',
-            controllerAs: 'vm'
-          },
-
-          'find-events@landing': {
-            templateUrl: '/html/core/views/find-events.html',
-            controller: 'FindEventsController',
-            controllerAs: 'vm'
-          }
-        }
-        // templateUrl: '/html/core/views/landing.html',
-        // controller: 'LandingController',
-        // controllerAs: 'vm'
+        templateUrl: '/html/core/views/landing.html'
       });
 
     // default uncaught routes to landing page
