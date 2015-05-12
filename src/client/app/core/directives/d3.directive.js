@@ -18,90 +18,82 @@
       link: function(scope, ele, attrs) {
         d3Service.d3().then(function(d3) {
 
-          var renderTimeout;
-          var margin = parseInt(attrs.margin) || 20,
-              barHeight = parseInt(attrs.barHeight) || 20,
-              barPadding = parseInt(attrs.barPadding) || 5;
+          var width = 960,
+              height = 500;
 
-          var svg = d3.select(ele[0])
-            .append('svg')
-            .style('width', '100%');
+          var color = d3.scale.category20();
 
-          // hard-code data
-          scope.data = [
-            {name: 'Greg', score: 98},
-            {name: 'Ari', score: 96},
-            {name: 'Q', score: 75},
-            {name: 'Loser', score: 48}
+          var force = d3.layout.force()
+              .charge(-500)
+              // .linkDistance(30)
+              .linkDistance(function(link) { return link.value * 10 })
+              .size([width, height]);
+
+          var svg = d3.select("body").append("svg")
+              .attr("width", width)
+              .attr("height", height);
+
+          var nodes = [
+            {name: 0, group: 0},
+            {name: 1, group: 0},
+            {name: 2, group: 0},
+            {name: 3, group: 0},
+            {name: 4, group: 0},
+            {name: 5, group: 0},
+            {name: 6, group: 0},
+            {name: 7, group: 0},
+            {name: 8, group: 0}
           ];
 
-          $window.onresize = function() {
-            scope.$apply();
-          };
+          var links = [
+            { source: 0, target: 1, value: 4 },
+            { source: 0, target: 7, value: 8 },
+            { source: 1, target: 2, value: 8 },
+            { source: 1, target: 7, value: 11 },
+            { source: 2, target: 3, value: 7 },
+            { source: 2, target: 8, value: 2 },
+            { source: 3, target: 4, value: 9 },
+            { source: 3, target: 5, value: 14 },
+            { source: 5, target: 4, value: 10 },
+            { source: 5, target: 2, value: 4 },
+            { source: 6, target: 5, value: 2 },
+            { source: 6, target: 8, value: 6 },
+            { source: 7, target: 6, value: 1 },
+            { source: 8, target: 7, value: 7 }
+          ];
 
-          scope.$watch(function() {
-            return angular.element($window)[0].innerWidth;
-          }, function() {
-            scope.render(scope.data);
+          force
+              .nodes(nodes)
+              .links(links)
+              .start();
+
+          var link = svg.selectAll(".link")
+              .data(links)
+            .enter().append("line")
+              .attr("class", "link")
+              .style("stroke-width", function(d) { return Math.sqrt(d.value); });
+
+          var node = svg.selectAll(".node")
+              .data(nodes)
+            .enter().append("circle")
+              .attr("class", "node")
+              .attr("r", 5)
+              .style("fill", function(d) { return color(d.group); })
+              .call(force.drag);
+
+          node.append("title")
+              .text(function(d) { return d.name; });
+
+          force.on("tick", function() {
+            link.attr("x1", function(d) { return d.source.x; })
+                .attr("y1", function(d) { return d.source.y; })
+                .attr("x2", function(d) { return d.target.x; })
+                .attr("y2", function(d) { return d.target.y; });
+
+            node.attr("cx", function(d) { return d.x; })
+                .attr("cy", function(d) { return d.y; });
           });
 
-          scope.$watch('data', function(newData) {
-            scope.render(newData);
-          }, true);
-
-          scope.render = function(data) {
-            svg.selectAll('*').remove();
-
-            if (!data) return;
-            if (renderTimeout) clearTimeout(renderTimeout);
-
-            renderTimeout = $timeout(function() {
-              var width = d3.select(ele[0])[0][0].offsetWidth - margin,
-                  height = scope.data.length * (barHeight + barPadding),
-                  color = d3.scale.category20(),
-                  xScale = d3.scale.linear()
-                    .domain([0, d3.max(data, function(d) {
-                      return d.score;
-                    })])
-                    .range([0, width]);
-
-              svg.attr('height', height);
-
-              svg.selectAll('rect')
-                .data(data)
-                .enter()
-                  .append('rect')
-                  .on('click', function(d,i) {
-                    return scope.onClick({item: d});
-                  })
-                  .attr('height', barHeight)
-                  .attr('width', 140)
-                  .attr('x', Math.round(margin/2))
-                  .attr('y', function(d,i) {
-                    return i * (barHeight + barPadding);
-                  })
-                  .attr('fill', function(d) {
-                    return color(d.score);
-                  })
-                  .transition()
-                    .duration(1000)
-                    .attr('width', function(d) {
-                      return xScale(d.score);
-                    });
-              svg.selectAll('text')
-                .data(data)
-                .enter()
-                  .append('text')
-                  .attr('fill', '#fff')
-                  .attr('y', function(d,i) {
-                    return i * (barHeight + barPadding) + 15;
-                  })
-                  .attr('x', 15)
-                  .text(function(d) {
-                    return d.name + ' (scored: ' + d.score + ')';
-                  });
-            }, 200);
-          };
         });
       }
     };
