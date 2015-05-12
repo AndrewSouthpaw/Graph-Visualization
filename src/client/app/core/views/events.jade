@@ -1,0 +1,17 @@
+.layout-selector
+  h3 Select layout:
+    button.btn.btn-default(type="button" ng-click="vm.changeViewMode('list')")
+      span.glyphicon.glyphicon-th-list
+    button.btn.btn-default(type="button" ng-click="vm.changeViewMode('grid')")
+      span.glyphicon.glyphicon-th
+
+.events
+  .event-card(ng-class="'event-card-' + vm.viewMode"
+              ng-repeat="event in vm.events")
+    .content
+      .event-image
+        img(ng-src="{{ event.imgSrc }}")
+      .event-content
+        h4 {{ event.name }}
+        p(ng-hide="event.dateEnd") {{ event.date | date:'EEE, MMM d, yyyy @ h:mma' }}
+        p(ng-show="event.dateEnd") {{ event.date | date:'EEE, MMM d'}} - {{ event.dateEnd | date:'EEE, MMM d, yyyy'}}
