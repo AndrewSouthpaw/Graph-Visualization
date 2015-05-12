@@ -34,15 +34,15 @@
               .attr('height', height);
 
           var nodes = [
-            {name: 0, group: 0},
-            {name: 1, group: 0},
-            {name: 2, group: 0},
-            {name: 3, group: 0},
-            {name: 4, group: 0},
-            {name: 5, group: 0},
-            {name: 6, group: 0},
-            {name: 7, group: 0},
-            {name: 8, group: 0}
+            {name: 0},
+            {name: 1},
+            {name: 2},
+            {name: 3},
+            {name: 4},
+            {name: 5},
+            {name: 6},
+            {name: 7},
+            {name: 8}
           ];
 
           var links = [
@@ -61,6 +61,9 @@
             { source: 7, target: 6, value: 1 },
             { source: 8, target: 7, value: 7 }
           ];
+
+          var selectedNode = null;
+          var selectedNodeD3 = null;
 
           force
               .nodes(nodes)
@@ -91,16 +94,42 @@
             .data(nodes)
             .enter()
             .append('g')
-            .classed('gnode', true);
+            .classed('gnode', true)
+            .on('mousedown', function(d) {
+              // console.log(d3.select(this).attr('fill'))
+              // d3.select(this).attr('class', 'selected');
+              if (selectedNode === d) return;
+              // remove formatting for previous node
+              if (selectedNodeD3) {
+                selectedNodeD3.select('circle').style('fill', 'red');
+              }
+
+              selectedNode = d;
+              selectedNodeD3 = d3.select(this);
+              selectedNodeD3.select('circle').style('fill', 'blue');
+            })
+            // .on('mouseover', function(d) {
+            //   // if(!mousedown_node || d === mousedown_node) return;
+            //   // enlarge target node
+            //   var newTransform = d3.select(this).attr('transform') + ' scale(1.5)';
+            //   d3.select(this).attr('transform', newTransform);
+            // })
+            // .on('mouseout', function(d) {
+            //   // if(!mousedown_node || d === mousedown_node) return;
+            //   // unenlarge target node
+            //   var current = d3.select(this).attr('transform');
+            //   d3.select(this).attr('transform', current.substring(0, current.indexOf(')') + 1));
+            // });
 
           var node = gnodes.append('circle')
               .attr('class', 'node')
               .attr('r', 10)
-              .style('fill', function(d) { return color(d.group); })
+              .style('fill', 'red')
               .call(force.drag);
 
           var labels = gnodes.append('text')
-            .text(function(d) { return d.name.toString(); });
+            .text(function(d) { return d.name.toString(); })
+            .style('fill', 'white');
 
           node.append('title')
               .text(function(d) { return d.name; });
