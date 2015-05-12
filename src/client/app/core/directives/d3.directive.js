@@ -73,13 +73,21 @@
               .attr("class", "link")
               .style("stroke-width", function(d) { return Math.sqrt(d.value); });
 
-          var node = svg.selectAll(".node")
-              .data(nodes)
-            .enter().append("circle")
+          // Create the groups under svg
+          var gnodes = svg.selectAll('g.gnode')
+            .data(nodes)
+            .enter()
+            .append('g')
+            .classed('gnode', true);
+
+          var node = gnodes.append("circle")
               .attr("class", "node")
-              .attr("r", 5)
+              .attr("r", 10)
               .style("fill", function(d) { return color(d.group); })
               .call(force.drag);
+
+          var labels = gnodes.append('text')
+            .text(function(d) { return d.name.toString(); });
 
           node.append("title")
               .text(function(d) { return d.name; });
@@ -90,8 +98,16 @@
                 .attr("x2", function(d) { return d.target.x; })
                 .attr("y2", function(d) { return d.target.y; });
 
-            node.attr("cx", function(d) { return d.x; })
-                .attr("cy", function(d) { return d.y; });
+            gnodes.attr('transform', function(d) {
+              return 'translate(' + [d.x, d.y] + ')';
+            });
+
+            labels.attr('transform', function(d) {
+              return 'translate(' + [-2, 5] + ')';
+            })
+
+            // node.attr("cx", function(d) { return d.x; })
+            //     .attr("cy", function(d) { return d.y; });
           });
 
         });
