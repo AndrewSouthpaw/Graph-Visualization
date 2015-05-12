@@ -96,8 +96,6 @@
             .append('g')
             .classed('gnode', true)
             .on('mousedown', function(d) {
-              // console.log(d3.select(this).attr('fill'))
-              // d3.select(this).attr('class', 'selected');
               if (selectedNode === d) return;
               // remove formatting for previous node
               if (selectedNodeD3) {
@@ -108,18 +106,18 @@
               selectedNodeD3 = d3.select(this);
               selectedNodeD3.select('circle').style('fill', 'blue');
             })
-            // .on('mouseover', function(d) {
-            //   // if(!mousedown_node || d === mousedown_node) return;
-            //   // enlarge target node
-            //   var newTransform = d3.select(this).attr('transform') + ' scale(1.5)';
-            //   d3.select(this).attr('transform', newTransform);
-            // })
-            // .on('mouseout', function(d) {
-            //   // if(!mousedown_node || d === mousedown_node) return;
-            //   // unenlarge target node
-            //   var current = d3.select(this).attr('transform');
-            //   d3.select(this).attr('transform', current.substring(0, current.indexOf(')') + 1));
-            // });
+            .on('mouseover', function(d) {
+              // if(!mousedown_node || d === mousedown_node) return;
+              // enlarge target node
+              var newTransform = d3.select(this).attr('transform') + ' scale(1.25)';
+              d3.select(this).attr('transform', newTransform);
+            })
+            .on('mouseout', function(d) {
+              // if(!mousedown_node || d === mousedown_node) return;
+              // unenlarge target node
+              var current = d3.select(this).attr('transform');
+              d3.select(this).attr('transform', current.substring(0, current.indexOf(')') + 1));
+            });
 
           var node = gnodes.append('circle')
               .attr('class', 'node')
