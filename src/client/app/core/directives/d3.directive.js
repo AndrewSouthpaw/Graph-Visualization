@@ -18,7 +18,6 @@
       link: function(scope, ele, attrs) {
         d3Service.d3().then(function(d3) {
 
-          console.log('reached')
           var renderTimeout;
           var margin = parseInt(attrs.margin) || 20,
               barHeight = parseInt(attrs.barHeight) || 20,
@@ -30,10 +29,10 @@
 
           // hard-code data
           scope.data = [
-            {name: "Greg", score: 98},
-            {name: "Ari", score: 96},
+            {name: 'Greg', score: 98},
+            {name: 'Ari', score: 96},
             {name: 'Q', score: 75},
-            {name: "Loser", score: 48}
+            {name: 'Loser', score: 48}
           ];
 
           $window.onresize = function() {
@@ -99,13 +98,13 @@
                   })
                   .attr('x', 15)
                   .text(function(d) {
-                    return d.name + " (scored: " + d.score + ")";
+                    return d.name + ' (scored: ' + d.score + ')';
                   });
             }, 200);
           };
         });
       }
-    }
+    };
   }
 
 }).call(this);
