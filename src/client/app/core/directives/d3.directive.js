@@ -26,7 +26,7 @@
           var force = d3.layout.force()
               .charge(-500)
               // .linkDistance(30)
-              .linkDistance(function(link) { return link.value * 10 })
+              .linkDistance(function(link) { return link.value * 12 })
               .size([width, height]);
 
           var svg = d3.select("body").append("svg")
@@ -67,11 +67,24 @@
               .links(links)
               .start();
 
+          svg.append("defs").append("marker")
+            .attr("id", "arrowhead")
+            .attr("refX", 6 + 3) /*must be smarter way to calculate shift*/
+            .attr("refY", 2)
+            .attr("markerWidth", 6)
+            .attr("markerHeight", 4)
+            .attr("orient", "auto")
+            .append("path")
+              .attr("d", "M 0,0 V 4 L6,2 Z"); //this is actual shape for arrowhead
+
+
           var link = svg.selectAll(".link")
-              .data(links)
+            .data(links)
             .enter().append("line")
-              .attr("class", "link")
-              .style("stroke-width", function(d) { return Math.sqrt(d.value); });
+            .attr("class", "link")
+            .attr('marker-end', 'url(#arrowhead)')
+            .style("stroke-width", 2);
+            // .style("stroke-width", function(d) { return Math.sqrt(d.value); });
 
           // Create the groups under svg
           var gnodes = svg.selectAll('g.gnode')
