@@ -21,11 +21,8 @@
           var width = 960,
               height = 500;
 
-          var color = d3.scale.category20();
-
           var force = d3.layout.force()
               .charge(-500)
-              // .linkDistance(30)
               .linkDistance(function(link) { return link.value * 12; })
               .size([width, height]);
 
@@ -94,15 +91,21 @@
             .append('path')
               .attr('d', 'M 0,0 V 4 L6,2 Z'); //this is actual shape for arrowhead
 
-
-          var link = svg.selectAll('.link')
+          var glinks = svg.selectAll('g.glink')
             .data(links)
-            .enter().append('line')
+            .enter()
+            .append('g')
+            .classed('glink', true);
+
+          var link = glinks.append('line')
             .attr('class', 'link')
             .attr('marker-end', 'url(#arrowhead)')
             .style('stroke', function(d) { return d.color; })
             .style('stroke-width', 2);
-            // .style('stroke-width', function(d) { return Math.sqrt(d.value); });
+
+          var linkLabels = glinks.append('text')
+            .text(function(d) { return d.value.toString(); })
+            .style('fill', 'black');
 
 
           function updateLinkColors(options) {
@@ -232,8 +235,14 @@
               return 'translate(' + [-2, 5] + ')';
             });
 
-            // node.attr('cx', function(d) { return d.x; })
-            //     .attr('cy', function(d) { return d.y; });
+            linkLabels
+              .attr('x', function(d) {
+                return d.source.x + (d.target.x - d.source.x) / 2;
+              })
+              .attr('y', function(d) {
+                return d.source.y + (d.target.y - d.source.y) / 2;
+              });
+
           });
 
         });
