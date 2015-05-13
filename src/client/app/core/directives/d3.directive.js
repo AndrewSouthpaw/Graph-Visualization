@@ -195,13 +195,11 @@
 
             })
             .on('mouseover', function(d) {
-              // if(!mousedown_node || d === mousedown_node) return;
               // enlarge target node
               var newTransform = d3.select(this).attr('transform') + ' scale(1.25)';
               d3.select(this).attr('transform', newTransform);
             })
             .on('mouseout', function(d) {
-              // if(!mousedown_node || d === mousedown_node) return;
               // unenlarge target node
               var current = d3.select(this).attr('transform');
               d3.select(this).attr('transform', current.substring(0, current.indexOf(')') + 1));
