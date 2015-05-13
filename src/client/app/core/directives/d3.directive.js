@@ -4,10 +4,10 @@
 
   angular
     .module('app.core')
-    .directive('d3Bars', d3Bars);
+    .directive('d3Graph', d3Graph);
 
   /* @ngInject */
-  function d3Bars($window, $timeout, d3Service) {
+  function d3Graph($window, $timeout, d3Service) {
     return {
       restrict: 'EA',
       scope: {
@@ -46,24 +46,38 @@
           ];
 
           var links = [
-            { source: 0, target: 1, value: 4 },
-            { source: 0, target: 7, value: 8 },
-            { source: 1, target: 2, value: 8 },
-            { source: 1, target: 7, value: 11 },
-            { source: 2, target: 3, value: 7 },
-            { source: 2, target: 8, value: 2 },
-            { source: 3, target: 4, value: 9 },
-            { source: 3, target: 5, value: 14 },
-            { source: 5, target: 4, value: 10 },
-            { source: 5, target: 2, value: 4 },
-            { source: 6, target: 5, value: 2 },
-            { source: 6, target: 8, value: 6 },
-            { source: 7, target: 6, value: 1 },
-            { source: 8, target: 7, value: 7 }
+            { source: 0, target: 1, value: 4, color: 'green' },
+            { source: 0, target: 7, value: 8, color: 'green' },
+            { source: 1, target: 2, value: 8, color: 'green' },
+            { source: 1, target: 7, value: 11, color: 'green' },
+            { source: 2, target: 3, value: 7, color: 'green' },
+            { source: 2, target: 8, value: 2, color: 'green' },
+            { source: 3, target: 4, value: 9, color: 'green' },
+            { source: 3, target: 5, value: 14, color: 'green' },
+            { source: 5, target: 4, value: 10, color: 'green' },
+            { source: 5, target: 2, value: 4, color: 'green' },
+            { source: 6, target: 5, value: 2, color: 'green' },
+            { source: 6, target: 8, value: 6, color: 'green' },
+            { source: 7, target: 6, value: 1, color: 'green' },
+            { source: 8, target: 7, value: 7, color: 'green' }
           ];
 
-          var selectedNode = null;
-          var selectedNodeD3 = null;
+          var graphObject = {
+            0: {edges: {1: 4, 7: 8}},
+            1: {edges: {2: 8, 7: 11}},
+            2: {edges: {3: 7, 8: 2}},
+            3: {edges: {4: 9, 5: 14}},
+            4: {edges: {}},
+            5: {edges: {4: 10, 2: 4}},
+            6: {edges: {5: 2, 8: 6}},
+            7: {edges: {6: 1}},
+            8: {edges: {7: 7}}
+          };
+
+          var fromNode = null;
+          var fromNodeD3 = null;
+          var toNode = null;
+          var toNodeD3 = null;
 
           force
               .nodes(nodes)
@@ -86,6 +100,7 @@
             .enter().append('line')
             .attr('class', 'link')
             .attr('marker-end', 'url(#arrowhead)')
+            .style('stroke', function(d) { return d.color; })
             .style('stroke-width', 2);
             // .style('stroke-width', function(d) { return Math.sqrt(d.value); });
 
@@ -96,15 +111,45 @@
             .append('g')
             .classed('gnode', true)
             .on('mousedown', function(d) {
-              if (selectedNode === d) return;
-              // remove formatting for previous node
-              if (selectedNodeD3) {
-                selectedNodeD3.select('circle').style('fill', 'red');
+
+              // links[1].color = 'red'
+              // svg.selectAll('.link')
+              //   .data(links)
+              //   .style('stroke', 'red');
+
+              // if shortest path has been calculated, clear selections
+              if (fromNode && toNode) {
+                // reset formatting
+                fromNodeD3.select('circle').style('fill', 'red');
+                toNodeD3.select('circle').style('fill', 'red');
+
+                // clear selections
+                fromNode = fromNodeD3 = null;
+                toNode = toNodeD3 = null;
               }
 
-              selectedNode = d;
-              selectedNodeD3 = d3.select(this);
-              selectedNodeD3.select('circle').style('fill', 'blue');
+              // deselect if first one is re-selected
+              if (fromNode === d) {
+                fromNodeD3.select('circle').style('fill', 'red');
+                fromNode = fromNodeD3 = null;
+                return;
+              }
+
+              // color first node if not yet selected
+              if (!fromNode) {
+                fromNode = d;
+                fromNodeD3 = d3.select(this);
+                fromNodeD3.select('circle').style('fill', 'blue');
+
+              // otherwise color the second node and calculate shortest path
+              } else {
+                toNode = d;
+                toNodeD3 = d3.select(this);
+                toNodeD3.select('circle').style('fill', 'blue');
+                var dijk = new Dijkstras(graphObject);
+                console.log(dijk.calc(fromNode.name, toNode.name))
+              }
+
             })
             .on('mouseover', function(d) {
               // if(!mousedown_node || d === mousedown_node) return;
