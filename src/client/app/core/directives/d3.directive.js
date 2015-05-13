@@ -145,6 +145,7 @@
                 fromNode = fromNodeD3 = null;
                 toNode = toNodeD3 = null;
                 updateLinkColors({ reset: true });
+                svg.selectAll('circle').style('fill', 'red');
               }
 
               // deselect if first one is re-selected
@@ -169,7 +170,7 @@
                 // calculate shortest path
                 var dijk = new Dijkstras(graphObject);
                 var result = dijk.calc(fromNode.name, toNode.name);
-                var path = result[1].split(' ');
+                var path = result[1].split(' ').map(function(n) { return parseInt(n); });
 
                 /**
                  * update link colors on the path in a lookahead fashion, so
@@ -177,12 +178,15 @@
                  */
                 for (var i = 0; i < path.length - 1; i++) {
                   // change link color
-                  var linkIndex = findLinkIndex(parseInt(path[i]), parseInt(path[i + 1]));
+                  var linkIndex = findLinkIndex(path[i], path[i + 1]);
                   links[linkIndex].color = 'blue';
-
-                  // if not the starting node, color a different shade
-
                 }
+
+                // update node colors not including start or destination
+                var nodesToColor = path.slice(1, -1);
+                svg.selectAll('circle').filter(function(d) {
+                  return nodesToColor.indexOf(d.name) > -1 ? d : undefined;
+                }).style('fill', '#add8e6');
 
                 // refresh colors on SVG
                 updateLinkColors();
