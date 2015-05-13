@@ -1,4 +1,4 @@
-
+/* jshint ignore:start */
 function BinaryHeap(scoreFunction) {
   this.content = [];
   this.scoreFunction = scoreFunction;
@@ -117,3 +117,4 @@ BinaryHeap.prototype = {
     }
   }
 };
+/* jshint ignore:end */

@@ -168,7 +168,7 @@
                 toNodeD3.select('circle').style('fill', 'blue');
 
                 // calculate shortest path
-                var dijk = new Dijkstras(graphObject);
+                var dijk = new Dijkstras(graphObject); // jshint ignore:line
                 var result = dijk.calc(fromNode.name, toNode.name);
                 var path = result[1].split(' ').map(function(n) { return parseInt(n); });
 

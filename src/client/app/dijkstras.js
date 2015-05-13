@@ -1,4 +1,4 @@
-
+/* jshint ignore:start */
 function Dijkstras(graphObject) {
   var graph = graphObject;
 
@@ -69,3 +69,4 @@ function Dijkstras(graphObject) {
     calc: calculate
   };
 }
+/* jshint ignore:end */
