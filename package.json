@@ -1,7 +1,7 @@
 {
-  "name": "LeadGenius-Coding-Challenge",
-  "version": "1.0.0",
-  "description": "> MEAN SPA that displays events scraped from an input website.",
+  "name": "Graph Visualization coding challenge",
+  "version": "0.0.1",
+  "description": "Visualizes shortest path of a graph",
   "private": true,
   "main": "Gulpfile.js",
   "scripts": {
@@ -11,14 +11,11 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/AndrewSouthpaw/Coding-Challenge---LG.git"
+    "url": "https://github.com/AndrewSouthpaw/Graph-Visualization"
   },
   "author": "Andrew Smith",
   "license": "",
-  "bugs": {
-    "url": "https://github.com/AndrewSouthpaw/Coding-Challenge---LG/issues"
-  },
-  "homepage": "https://github.com/AndrewSouthpaw/Coding-Challenge---LG",
+  "homepage": "https://github.com/AndrewSouthpaw/Graph-Visualization",
   "dependencies": {
     "body-parser": "^1.11.0",
     "bower": "^1.3.12",

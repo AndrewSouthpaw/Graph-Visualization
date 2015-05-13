@@ -1,7 +1,7 @@
 {
-  "name": "LeadGenius-Coding-Challenge",
-  "version": "1.0.0",
-  "homepage": "https://github.com/AndrewSouthpaw/Coding-Challenge---LG",
+  "name": "Graph visualizer coding challenge",
+  "version": "0.0.1",
+  "homepage": "https://github.com/AndrewSouthpaw/Graph-Visualization",
   "authors": [
     "Andrew Smith <andrewsmith@alumni.stanford.edu>"
   ],

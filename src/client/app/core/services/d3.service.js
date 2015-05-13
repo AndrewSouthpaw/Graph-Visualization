@@ -1,5 +1,7 @@
 /**
- * Code used from http://bit.ly/1F5aiD9
+ * Code used from http://bit.ly/1F5aiD9. Adds D3 to page to make code available
+ * to program. Returns a promise to allow consumers to wait for D3 to load
+ * before proceeding.
  */
 
 ;(function() {
@@ -22,8 +24,7 @@
     var scriptTag = $document[0].createElement('script');
     scriptTag.type = 'text/javascript';
     scriptTag.async = true;
-    scriptTag.src = 'js/d3.js';
-    // scriptTag.src = 'http://d3js.org/d3.v3.min.js';
+    scriptTag.src = 'http://d3js.org/d3.v3.min.js';
     scriptTag.onreadystatechange = function () {
       if (this.readyState === 'complete') onScriptLoad();
     };
@@ -37,7 +38,4 @@
     };
   }
 
-
-
 }).call(this);
-
