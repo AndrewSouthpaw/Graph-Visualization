@@ -34,32 +34,32 @@
               .attr('height', height);
 
           var nodes = [
-            {name: 0},
-            {name: 1},
-            {name: 2},
-            {name: 3},
-            {name: 4},
-            {name: 5},
-            {name: 6},
-            {name: 7},
-            {name: 8}
+            {name: 0, color: 'red'},
+            {name: 1, color: 'red'},
+            {name: 2, color: 'red'},
+            {name: 3, color: 'red'},
+            {name: 4, color: 'red'},
+            {name: 5, color: 'red'},
+            {name: 6, color: 'red'},
+            {name: 7, color: 'red'},
+            {name: 8, color: 'red'}
           ];
 
           var links = [
-            { source: 0, target: 1, value: 4, color: 'green' },
-            { source: 0, target: 7, value: 8, color: 'green' },
-            { source: 1, target: 2, value: 8, color: 'green' },
-            { source: 1, target: 7, value: 11, color: 'green' },
-            { source: 2, target: 3, value: 7, color: 'green' },
-            { source: 2, target: 8, value: 2, color: 'green' },
-            { source: 3, target: 4, value: 9, color: 'green' },
-            { source: 3, target: 5, value: 14, color: 'green' },
-            { source: 5, target: 4, value: 10, color: 'green' },
-            { source: 5, target: 2, value: 4, color: 'green' },
-            { source: 6, target: 5, value: 2, color: 'green' },
-            { source: 6, target: 8, value: 6, color: 'green' },
-            { source: 7, target: 6, value: 1, color: 'green' },
-            { source: 8, target: 7, value: 7, color: 'green' }
+            { source: 0, target: 1, value: 4, color: 'gray' },
+            { source: 0, target: 7, value: 8, color: 'gray' },
+            { source: 1, target: 2, value: 8, color: 'gray' },
+            { source: 1, target: 7, value: 11, color: 'gray' },
+            { source: 2, target: 3, value: 7, color: 'gray' },
+            { source: 2, target: 8, value: 2, color: 'gray' },
+            { source: 3, target: 4, value: 9, color: 'gray' },
+            { source: 3, target: 5, value: 14, color: 'gray' },
+            { source: 5, target: 4, value: 10, color: 'gray' },
+            { source: 5, target: 2, value: 4, color: 'gray' },
+            { source: 6, target: 5, value: 2, color: 'gray' },
+            { source: 6, target: 8, value: 6, color: 'gray' },
+            { source: 7, target: 6, value: 1, color: 'gray' },
+            { source: 8, target: 7, value: 7, color: 'gray' }
           ];
 
           var graphObject = {
@@ -104,6 +104,29 @@
             .style('stroke-width', 2);
             // .style('stroke-width', function(d) { return Math.sqrt(d.value); });
 
+
+          function updateLinkColors(options) {
+            if (options && options.reset) {
+              links.forEach(function(link) { link.color = 'gray'; });
+            }
+
+            svg.selectAll('.link')
+              .data(links)
+              .style('stroke', function(d) {
+                return d.color;
+              });
+          }
+
+          function findLinkIndex(from, to) {
+            return links.reduce(function(acc, link, index) {
+              if (link.source.name === from && link.target.name === to) {
+                return index;
+              } else {
+                return acc;
+              }
+            }, -1);
+          }
+
           // Create the groups under svg
           var gnodes = svg.selectAll('g.gnode')
             .data(nodes)
@@ -111,11 +134,6 @@
             .append('g')
             .classed('gnode', true)
             .on('mousedown', function(d) {
-
-              // links[1].color = 'red'
-              // svg.selectAll('.link')
-              //   .data(links)
-              //   .style('stroke', 'red');
 
               // if shortest path has been calculated, clear selections
               if (fromNode && toNode) {
@@ -126,6 +144,7 @@
                 // clear selections
                 fromNode = fromNodeD3 = null;
                 toNode = toNodeD3 = null;
+                updateLinkColors({ reset: true });
               }
 
               // deselect if first one is re-selected
@@ -141,13 +160,33 @@
                 fromNodeD3 = d3.select(this);
                 fromNodeD3.select('circle').style('fill', 'blue');
 
-              // otherwise color the second node and calculate shortest path
+              // otherwise color the second node and show shortest path
               } else {
                 toNode = d;
                 toNodeD3 = d3.select(this);
                 toNodeD3.select('circle').style('fill', 'blue');
+
+                // calculate shortest path
                 var dijk = new Dijkstras(graphObject);
-                console.log(dijk.calc(fromNode.name, toNode.name))
+                var result = dijk.calc(fromNode.name, toNode.name);
+                var path = result[1].split(' ');
+
+                /**
+                 * update link colors on the path in a lookahead fashion, so
+                 * don't use the destination node
+                 */
+                for (var i = 0; i < path.length - 1; i++) {
+                  // change link color
+                  var linkIndex = findLinkIndex(parseInt(path[i]), parseInt(path[i + 1]));
+                  links[linkIndex].color = 'blue';
+
+                  // if not the starting node, color a different shade
+
+                }
+
+                // refresh colors on SVG
+                updateLinkColors();
+
               }
 
             })
