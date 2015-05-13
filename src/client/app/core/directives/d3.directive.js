@@ -11,25 +11,14 @@
     return {
       restrict: 'EA',
       scope: {
-        // data: '=',
         label: '@',
         onClick: '&'
       },
       link: function(scope, ele, attrs) {
+        // wait for d3 to load
         d3Service.d3().then(function(d3) {
 
-          var width = 960,
-              height = 500;
-
-          var force = d3.layout.force()
-              .charge(-500)
-              .linkDistance(function(link) { return link.value * 12; })
-              .size([width, height]);
-
-          var svg = d3.select('body').append('svg')
-              .attr('width', width)
-              .attr('height', height);
-
+          // data to describe the graph
           var nodes = [
             {name: 0, color: 'red'},
             {name: 1, color: 'red'},
@@ -41,6 +30,18 @@
             {name: 7, color: 'red'},
             {name: 8, color: 'red'}
           ];
+
+          var graphObject = {
+            0: {edges: {1: 4, 7: 8}},
+            1: {edges: {2: 8, 7: 11}},
+            2: {edges: {3: 7, 8: 2}},
+            3: {edges: {4: 9, 5: 14}},
+            4: {edges: {}},
+            5: {edges: {4: 10, 2: 4}},
+            6: {edges: {5: 2, 8: 6}},
+            7: {edges: {6: 1}},
+            8: {edges: {7: 7}}
+          };
 
           var links = [
             { source: 0, target: 1, value: 4, color: 'gray' },
@@ -59,31 +60,24 @@
             { source: 8, target: 7, value: 7, color: 'gray' }
           ];
 
-          var graphObject = {
-            0: {edges: {1: 4, 7: 8}},
-            1: {edges: {2: 8, 7: 11}},
-            2: {edges: {3: 7, 8: 2}},
-            3: {edges: {4: 9, 5: 14}},
-            4: {edges: {}},
-            5: {edges: {4: 10, 2: 4}},
-            6: {edges: {5: 2, 8: 6}},
-            7: {edges: {6: 1}},
-            8: {edges: {7: 7}}
-          };
+          // set SVG properties
+          var width = 960,
+              height = 500;
 
+          var svg = d3.select('body').append('svg')
+              .attr('width', width)
+              .attr('height', height);
+
+          // variables to track which nodes and D3 equivalents are selected
           var fromNode = null;
           var fromNodeD3 = null;
           var toNode = null;
           var toNodeD3 = null;
 
-          force
-              .nodes(nodes)
-              .links(links)
-              .start();
-
+          // add arrowheads on links, based on http://bit.ly/1QJg7vc
           svg.append('defs').append('marker')
             .attr('id', 'arrowhead')
-            .attr('refX', 6 + 3) /*must be smarter way to calculate shift*/
+            .attr('refX', 6 + 3)
             .attr('refY', 2)
             .attr('markerWidth', 6)
             .attr('markerHeight', 4)
@@ -91,23 +85,32 @@
             .append('path')
               .attr('d', 'M 0,0 V 4 L6,2 Z'); //this is actual shape for arrowhead
 
+          // create grouping for links and their labels
           var glinks = svg.selectAll('g.glink')
             .data(links)
             .enter()
             .append('g')
             .classed('glink', true);
 
+          // create link line
           var link = glinks.append('line')
             .attr('class', 'link')
             .attr('marker-end', 'url(#arrowhead)')
             .style('stroke', function(d) { return d.color; })
             .style('stroke-width', 2);
 
+          // create labels for links, displaying link length
           var linkLabels = glinks.append('text')
             .text(function(d) { return d.value.toString(); })
             .style('fill', 'black');
 
-
+          /**
+           * Helper function to cycle through links and update their color
+           * display based on their properties
+           * @param  {Object} options Options object
+           *                            reset: sets all links to default color
+           * @return {undefined}
+           */
           function updateLinkColors(options) {
             if (options && options.reset) {
               links.forEach(function(link) { link.color = 'gray'; });
@@ -120,6 +123,14 @@
               });
           }
 
+          /**
+           * Finds the index of a link in the links object that connects
+           * two nodes
+           * @note  Returns -1 if link not found
+           * @param  {Number} from Node number source
+           * @param  {Number} to   Node number destination
+           * @return {Number}      Index of link connecting the two nodes
+           */
           function findLinkIndex(from, to) {
             return links.reduce(function(acc, link, index) {
               if (link.source.name === from && link.target.name === to) {
@@ -130,7 +141,7 @@
             }, -1);
           }
 
-          // Create the groups under svg
+          // Create groups for nodes and labels in SVG
           var gnodes = svg.selectAll('g.gnode')
             .data(nodes)
             .enter()
@@ -166,6 +177,7 @@
 
               // otherwise color the second node and show shortest path
               } else {
+                // select destination node and color
                 toNode = d;
                 toNodeD3 = d3.select(this);
                 toNodeD3.select('circle').style('fill', 'blue');
@@ -193,48 +205,66 @@
 
                 // refresh colors on SVG
                 updateLinkColors();
-
               }
 
             })
+            // enlarge target node on mouseover
             .on('mouseover', function(d) {
-              // enlarge target node
+              // take current transform and append a scaling factor
               var newTransform = d3.select(this).attr('transform') + ' scale(1.25)';
               d3.select(this).attr('transform', newTransform);
             })
+            // unenlarge target node on mouseout
             .on('mouseout', function(d) {
-              // unenlarge target node
+              // slice off scaling factor of current transform
               var current = d3.select(this).attr('transform');
-              d3.select(this).attr('transform', current.substring(0, current.indexOf(')') + 1));
+              var newTransform = current.substring(0, current.indexOf(')') + 1);
+              d3.select(this).attr('transform', newTransform);
             });
 
+          // create node circles
           var node = gnodes.append('circle')
               .attr('class', 'node')
               .attr('r', 10)
-              .style('fill', 'red')
-              .call(force.drag);
+              .style('fill', 'red');
 
+          // place labels on nodes
           var labels = gnodes.append('text')
             .text(function(d) { return d.name.toString(); })
             .style('fill', 'white');
 
-          node.append('title')
-              .text(function(d) { return d.name; });
+          // describe the force properties of layout
+          var force = d3.layout.force()
+            .charge(-500)
+            .linkDistance(function(link) { return link.value * 12; })
+            .size([width, height]);
 
+          // initialize data in force layout
+          force
+            .nodes(nodes)
+            .links(links)
+            .start();
+
+          // allow nodes to be dragged by user
+          node.call(force.drag);
+
+          // describe positioning of elements in force layout
           force.on('tick', function() {
             link.attr('x1', function(d) { return d.source.x; })
-                .attr('y1', function(d) { return d.source.y; })
-                .attr('x2', function(d) { return d.target.x; })
-                .attr('y2', function(d) { return d.target.y; });
+              .attr('y1', function(d) { return d.source.y; })
+              .attr('x2', function(d) { return d.target.x; })
+              .attr('y2', function(d) { return d.target.y; });
 
             gnodes.attr('transform', function(d) {
               return 'translate(' + [d.x, d.y] + ')';
             });
 
+            // offset node labels slightly to center in circle
             labels.attr('transform', function(d) {
               return 'translate(' + [-2, 5] + ')';
             });
 
+            // position link labels to be midway along link
             linkLabels
               .attr('x', function(d) {
                 return d.source.x + (d.target.x - d.source.x) / 2;
